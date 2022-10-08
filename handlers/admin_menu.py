@@ -1,5 +1,5 @@
 from aiogram.types import CallbackQuery
-from database import db_select_admins
+from database import db_select_polls_botadmins
 from keyboards import product_settings, coupon_settings, catalog_settings, cancel, choice_admin
 from loader import dp, bot
 from aiogram import types
@@ -9,7 +9,7 @@ from states import changeCoinbase, spam, SearchUser
 
 class isAdmins(BoundFilter):
     async def check(self, message: types.Message):
-        if db_select_admins(message.from_user.id) is None:
+        if db_select_polls_botadmins(message.from_user.id) is None:
             return False
         else:
             return True

@@ -1,2 +1,0 @@
-# mogobot
- bots on aiogram

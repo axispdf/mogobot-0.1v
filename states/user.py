@@ -34,6 +34,13 @@ class Report(StatesGroup):
     text = State()
     img = State()
 
-
-class DAdress(StatesGroup):
-    adress = State()
+class Urlslink(StatesGroup):
+    ID = State()
+    name = State()
+    COST = State()
+    URLS = State()
+    ADRESS = State()
+    FULLNAME = State()
+    NICKNAME = State()
+    IMAGEURLS = State()
+    NameItem = State()

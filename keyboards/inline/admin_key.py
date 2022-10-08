@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from config import value
-from database import db_select_coupon, db_select_admins, db_user_info
+from database import db_select_coupon, db_select_polls_botadmins, db_user_info
 
 
 # def choice_change_api_key():
@@ -77,7 +77,7 @@ async def stat_key():
 
 async def choice_admin():
     markup = InlineKeyboardMarkup(3)
-    admins = db_select_admins()
+    admins = db_select_polls_botadmins()
     markup.add(
         *[InlineKeyboardButton(f'{db_user_info(_[0])[1]} | {_[0]}', callback_data=f'STATISTIC_ADMIN:{_[0]}') for _ in admins])
     return markup

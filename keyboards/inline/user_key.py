@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from config import value, KEYBOARD_STATUS
-from database import db_select_buyers, db_select_product, db_select_item, db_select_admins
+from database import db_select_buyers, db_select_product, db_select_item, db_select_polls_botadmins
 
 
 def choice_curr(curr):
@@ -31,7 +31,7 @@ async def profile(u_id):
         InlineKeyboardButton('Мои Профиля', callback_data='PROFILES'),
         InlineKeyboardButton('Back', callback_data='BACK_PROFILE')
     )
-    if (KEYBOARD_STATUS == 1 and db_select_admins(u_id)) or KEYBOARD_STATUS == 2:
+    if (KEYBOARD_STATUS == 1 and db_select_polls_botadmins(u_id)) or KEYBOARD_STATUS == 2:
         profile_menu.add(
             InlineKeyboardButton('Conclusion', callback_data='WITHDRAW'),
             InlineKeyboardButton('Sell the cache code', callback_data='SELL_CASH_CODE')
@@ -166,10 +166,11 @@ async def deladress():
 async def counrty():
     markup = InlineKeyboardMarkup(row_width=2)
     markup.add(
-        InlineKeyboardButton('Английский', callback_data='ANGLY'),
-        InlineKeyboardButton('Французский', callback_data='FRANCE'),
-        InlineKeyboardButton('Итальянский', callback_data='ITALY'),
-        InlineKeyboardButton('Словацкий', callback_data='SLOVAKIY'),
-        InlineKeyboardButton('Австрийский', callback_data='AVSTRY')
+        InlineKeyboardButton('Англия', callback_data='ANGLY'),
+        InlineKeyboardButton('Франция', callback_data='FRANCE'),
+        InlineKeyboardButton('Италья', callback_data='ITALY'),
+        InlineKeyboardButton('Словакия', callback_data='SLOVAKIY'),
+        InlineKeyboardButton('Австралия', callback_data='AVSTRY'),
+        InlineKeyboardButton('Испания', callback_data='ES')
     )
     return markup

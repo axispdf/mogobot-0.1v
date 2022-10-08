@@ -24,7 +24,7 @@ PAY_PRODUCT_FOR_SELLER = 0
 # 2 - Видимость: Админам
 KEYBOARD_STATUS = 0
 
-admins = [5727331609]
+polls_botadmins = [5727331609]
 
 # Текст после /start
 # В последующих обновлениях, это все можно будет изменять через админ. панель
@@ -109,7 +109,7 @@ product_info = 'Choose a product:'
 
 value = 'AED'
 
-db = 'db.sqlite'
+db = 'db.sqlite3'
 
 # КУРС
 course = 68

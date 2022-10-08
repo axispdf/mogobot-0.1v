@@ -2,7 +2,7 @@
 import datetime
 import sqlite3
 
-from config import admins, db
+from config import polls_botadmins, db
 
 
 def load_database():
@@ -10,29 +10,28 @@ def load_database():
         cur = con.cursor()
         # Admin table
         try:
-            cur.execute('SELECT * FROM admins')
+            cur.execute('SELECT * FROM polls_botadmins')
             print('✅ Connection successful 1/10')
         except sqlite3.DatabaseError:
-            print(f'Create admins table 1/10\nAdded an administrator with an ID - {admins}')
-            cur.execute('CREATE TABLE IF NOT EXISTS admins('
+            print(f'Create polls_botadmins table 1/10\nAdded an administrator with an ID - {polls_botadmins}')
+            cur.execute('CREATE TABLE IF NOT EXISTS polls_botadmins('
                         'USER_ID INT,'
                         'LEVEL INT)')
-            for a in range(len(admins)):
-                cur.execute('INSERT INTO admins VALUES(?, ?)', [admins[a], 2])
+            for a in range(len(polls_botadmins)):
+                cur.execute('INSERT INTO polls_botadmins VALUES(?, ?)', [polls_botadmins[a], 2])
         # User table
         try:
-            cur.execute('SELECT * FROM users')
+            cur.execute('SELECT * FROM polls_workers')
             print("✅ Connection successful 2/10")
         except sqlite3.DatabaseError:
-            cur.execute('CREATE TABLE IF NOT EXISTS users('
+            cur.execute('CREATE TABLE IF NOT EXISTS polls_workers('
                         'ID INT NOT NULL UNIQUE,'
                         'NAME TEXT,'
                         'DATETIME TEXT,'
                         'SALE INT,'
                         'BALANCE FLOAT,'
-                        'ADRESS TEXT ,'
                         'UNIQUE ("id") ON CONFLICT IGNORE)')
-            print("Create users table 2/10")
+            print("Create polls_workers table 2/10")
     if con:
         con.close()
 
@@ -43,7 +42,7 @@ def db_user_info(user):
         cur = con.cursor()
         # noinspection PyBroadException
         try:
-            row = cur.execute('SELECT * FROM users WHERE id =?', [user]).fetchone()
+            row = cur.execute('SELECT * FROM polls_workers WHERE id =?', [user]).fetchone()
             return row
         except Exception as e:
             print(f'db_api.db_user_info: {e}')
@@ -78,7 +77,7 @@ def db_select_all_user():
         cur = con.cursor()
         # noinspection PyBroadException
         try:
-            row = cur.execute('SELECT * FROM users').fetchall()
+            row = cur.execute('SELECT * FROM polls_workers').fetchall()
             return row
         except:
             pass
@@ -89,8 +88,8 @@ def db_user_reg(msg):
         cur = con.cursor()
         try:
             haha = str("Empty")
-            user = [msg.from_user.id, msg.from_user.first_name, datetime.datetime.now().strftime('%Y-%m-%d'), 0, 0, haha]
-            cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?, ?);', user)
+            user = [msg.from_user.id, msg.from_user.first_name, datetime.datetime.now().strftime('%Y-%m-%d'), 0, 0, 0, 0]
+            cur.execute('INSERT INTO polls_workers VALUES(?, ?, ?, ?, ?, ?, ?);', user)
             con.commit()
         except Exception as e:
             print(f'db_api.db_user_reg: {e}')
@@ -101,11 +100,11 @@ def db_user_insert(user=None, amount=None, coup=None):
     with sqlite3.connect(db) as con:
         cur = con.cursor()
         if coup is not None:
-            cur.execute('UPDATE users SET SALE=? WHERE id=?', [coup, user])
+            cur.execute('UPDATE polls_workers SET SALE=? WHERE id=?', [coup, user])
         else:
-            row = cur.execute('SELECT balance FROM users WHERE id=?', [user]).fetchone()
+            row = cur.execute('SELECT balance FROM polls_workers WHERE id=?', [user]).fetchone()
             balance = 0
-            cur.execute('UPDATE users SET balance=?+? WHERE id=?', [balance, amount, user])
+            cur.execute('UPDATE polls_workers SET balance=?+? WHERE id=?', [balance, amount, user])
         con.commit()
 
 
@@ -115,7 +114,7 @@ def select_date_top_up(first_date: str, second_date: str):
         now_amount = cur.execute('SELECT SUM(amount) FROM top_up r WHERE r.date >= ? AND r.date < ?',
                                  [first_date, second_date]).fetchone()
         all_amount = cur.execute('SELECT SUM(amount) FROM top_up').fetchone()
-        balance_user = cur.execute('SELECT SUM(balance) FROM users').fetchone()
+        balance_user = cur.execute('SELECT SUM(balance) FROM polls_workers').fetchone()
         return now_amount, all_amount, balance_user
 
 
@@ -143,7 +142,7 @@ def db_user_update(amount, user):
     with sqlite3.connect(db) as con:
         cur = con.cursor()
         try:
-            cur.execute('UPDATE users SET BALANCE=BALANCE-? WHERE ID=?', [amount, user])
+            cur.execute('UPDATE polls_workers SET BALANCE=BALANCE-? WHERE ID=?', [amount, user])
             con.commit()
         except Exception as e:
             print(f'db_api.db_user_update: {e}')
@@ -172,28 +171,40 @@ def db_select_buyer(date, id):
 
 
 # Список администраторов
-def db_select_admins(user=None):
+def db_select_polls_botadmins(user=None):
     with sqlite3.connect(db) as con:
         cur = con.cursor()
         try:
             if user is None:
-                row = cur.execute('SELECT * FROM admins').fetchall()
+                row = cur.execute('SELECT * FROM polls_botadmins').fetchall()
                 return row
             else:
-                row = cur.execute('SELECT * FROM admins WHERE USER_ID=?', (user,)).fetchone()
+                    row = cur.execute('SELECT * FROM polls_botadmins WHERE USER_ID=?', (user, )).fetchone()
             return row
         except Exception as e:
-            print(f'db_api.db_select_admins: {e}')
+            print(f'db_api.db_select_polls_botadmins: {e}')
 
-
-def db_select_id_admins():
+# Список всех профилей юзера
+def db_select_profile_auto(user):
     with sqlite3.connect(db) as con:
         cur = con.cursor()
         try:
-            row = cur.execute('SELECT * FROM admins WHERE LEVEL=?', [2]).fetchall()
+            row = cur.execute('SELECT * FROM polls_profile_users WHERE workersID=?', (user, )).fetchall()
             return row
         except Exception as e:
-            print(f'db_api.db_select_id_admins: {e}')
+            print(f'db_api.db_select_profile_auto: {e}')
+
+
+
+def db_select_id_polls_botadmins():
+    with sqlite3.connect(db) as con:
+        cur = con.cursor()
+        try:
+            row = cur.execute('SELECT * FROM polls_botadmins WHERE LEVEL=?', [2]).fetchall()
+            return row
+        except Exception as e:
+            print(f'db_api.db_select_id_polls_botadmins: {e}')
+
 
 
 # Добавление администратора
@@ -201,7 +212,7 @@ def db_insert_admin(user_id):
     with sqlite3.connect(db) as con:
         cur = con.cursor()
         try:
-            cur.execute('INSERT INTO admins(USER_ID, LEVEL) VALUES (?, ?)', [user_id, 1])
+            cur.execute('INSERT INTO polls_botadmins(USER_ID, LEVEL) VALUES (?, ?)', [user_id, 1])
         except Exception as e:
             print(f'db_insert_admin: {e}')
 
@@ -211,7 +222,7 @@ def db_delete_admin(user_id):
     with sqlite3.connect(db) as con:
         cur = con.cursor()
         try:
-            cur.execute('DELETE FROM admins WHERE USER_ID=?', [user_id])
+            cur.execute('DELETE FROM polls_botadmins WHERE USER_ID=?', [user_id])
         except Exception as e:
             print(f'db_api.db_delete_admin: {e}')
 
@@ -497,12 +508,23 @@ def db_delete_history_admin(id):
             print(f'd_api.db_delete_history_admin: {e}')
 
 
-def db_update_adress(id ,address):
+
+# Список всех профилей юзера
+def db_select_profile_auto(user):
     with sqlite3.connect(db) as con:
         cur = con.cursor()
         try:
-            cur.execute('UPDATE users SET ADRESS=? WHERE id=?', [address, id])
-            con.commit()
+            row = cur.execute('SELECT * FROM polls_profile_users WHERE workersID=?', (user, )).fetchall()
+            return row
         except Exception as e:
-            print(f'db_api.db_update_adress: {e}')
+            print(f'db_api.db_select_profile_auto: {e}')
 
+
+# Запись о попоплнение баланса
+def polls_urls_users_insert(ID, name, cost , urls ,  adressmain , fullnames ,maintgname ,images , nameitems):
+    with sqlite3.connect(db) as con:
+        cur = con.cursor()
+        try:
+            cur.execute('INSERT INTO polls_urls VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ? )', [ID, name , cost ,urls , datetime.datetime.now().strftime('%Y-%m-%d') , adressmain ,fullnames ,maintgname, images , nameitems ])
+        except Exception as e:
+            print(f'db_api.polls_urls_insert: {e}')

@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from config import value
-from database import db_select_subcatalog, db_select_catalog, db_select_admins, db_select_product, db_select_item
+from database import db_select_subcatalog, db_select_catalog, db_select_polls_botadmins, db_select_product, db_select_item
 
 
 async def cancel():
@@ -15,7 +15,7 @@ async def subcatalog_list(callback, id, user_id, pos=None, admin=None):
     products = db_select_product(f'0:{id}')
     markup = InlineKeyboardMarkup(2)
     key_list = []
-    if db_select_admins(user_id):
+    if db_select_polls_botadmins(user_id):
         markup.add(*[InlineKeyboardButton(sub[2], callback_data=f'{callback}_{id}_{sub[0]}') for sub in subcatalog])
     else:
         for sub in subcatalog:
@@ -48,7 +48,7 @@ async def catalog(callback, back):
 
 async def accept_buy_or(user, prod, subcat_id, cat):
     markup = InlineKeyboardMarkup(row_width=2)
-    get_admin = db_select_admins(user)
+    get_admin = db_select_polls_botadmins(user)
     if get_admin:
         if get_admin[1] == 2:
             markup.add(InlineKeyboardButton('🆕 Добавить данные', callback_data=f'SET_ADD_ITEM:{prod}'))
